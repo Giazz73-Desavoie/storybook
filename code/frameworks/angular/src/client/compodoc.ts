@@ -135,7 +135,12 @@ const extractEnumValues = (compodocType: any) => {
     // Compodoc emits TypeScript literal unions with single-quoted strings (e.g. 'S' | 'M' | 'L'),
     // which JSON.parse rejects. Strip the surrounding quotes and unescape inner escaped quotes.
     if (s.length >= 2 && s[0] === "'" && s[s.length - 1] === "'") {
-      return s.slice(1, -1).replace(/\\'/g, "'");
+      const inner = s.slice(1, -1).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      try {
+        return JSON.parse('"' + inner + '"');
+      } catch {
+        return undefined;
+      }
     }
     try {
       return JSON.parse(s);
